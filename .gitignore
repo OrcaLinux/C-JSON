@@ -1,0 +1,11 @@
+# Ignore build artifacts
+build/
+*.o
+*.a
+*.so
+
+# Ignore editor/IDE-specific files
+*.swp
+*.swo
+.vscode/
+.idea/
