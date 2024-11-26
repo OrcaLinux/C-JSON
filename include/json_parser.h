@@ -25,7 +25,7 @@ extern "C"
      * @param[in] json The null-terminated JSON string to parse.
      * @return Pointer to the root JsonValue if parsing is successful, NULL otherwise.
      *
-     * @note It is the caller's responsibility to free the returned JsonValue using `json_free` to avoid memory leaks.
+     * @note It is the caller's responsibility to free the returned JsonValue using `json_free_value` to avoid memory leaks.
      */
     JsonValue *json_parse(const char *json);
 

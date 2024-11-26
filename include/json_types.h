@@ -50,7 +50,7 @@ struct JsonValue
         int boolean;        /**< Boolean value if type is JSON_BOOL. */
         JsonArray *array;   /**< Array value if type is JSON_ARRAY. */
         JsonObject *object; /**< Object value if type is JSON_OBJECT. */
-    };
+    } value;                /**< The value data based on the type. */
 };
 
 /**
@@ -74,7 +74,7 @@ struct JsonPair
 struct JsonObject
 {
     JsonPair *pairs; /**< Array of key-value pairs. */
-    size_t size;     /**< Number of key-value pairs in the object. */
+    size_t count;    /**< Number of key-value pairs. */
 };
 
 /**
@@ -85,8 +85,8 @@ struct JsonObject
  */
 struct JsonArray
 {
-    JsonValue **values; /**< Array of pointers to JsonValue. */
-    size_t size;        /**< Number of elements in the array. */
+    JsonValue **items; /**< Dynamic array of pointers to JSON values. */
+    size_t count;      /**< Number of items in the array. */
 };
 
 #endif // JSON_TYPES_H

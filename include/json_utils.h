@@ -23,7 +23,7 @@
  *
  * @note It is the caller's responsibility to free the allocated memory using `json_free`.
  */
-void* json_alloc(size_t size);
+void *json_alloc(size_t size);
 
 /**
  * @brief Reallocates memory to a new size.
@@ -38,7 +38,7 @@ void* json_alloc(size_t size);
  * @note If reallocation fails, the original memory block remains unchanged.
  *       It is the caller's responsibility to handle the NULL return value appropriately.
  */
-void* json_realloc(void *ptr, size_t size);
+void *json_realloc(void *ptr, size_t size);
 
 /**
  * @brief Frees the allocated memory.
@@ -64,7 +64,7 @@ void json_free(void *ptr);
  *
  * @note The caller is responsible for freeing the duplicated string using `json_free`.
  */
-char* json_strdup(const char *s);
+char *json_strdup(const char *s);
 
 /**
  * @brief Duplicates a range of characters from a string.
@@ -80,7 +80,7 @@ char* json_strdup(const char *s);
  * @note The duplicated string will contain `len` characters followed by a null terminator.
  *       The caller is responsible for freeing the duplicated string using `json_free`.
  */
-char* json_strdup_range(const char *s, size_t len);
+char *json_strdup_range(const char *s, size_t len);
 
 /**
  * @brief Checks if a character is considered whitespace in JSON.
