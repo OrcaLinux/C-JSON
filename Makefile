@@ -24,9 +24,11 @@ INCLUDE_DIR = include
 TEST_DIR = tests
 EXAMPLES_DIR = examples
 BUILD_DIR = build
+BIN_DIR = bin
 
 # Source files
-SRC_FILES = $(SRC_DIR)/json_parser.c $(SRC_DIR)/json_tokenizer.c $(SRC_DIR)/json_utils.c
+# Updated to include all .c files in src/
+SRC_FILES = $(wildcard $(SRC_DIR)/*.c)
 TEST_FILES = $(TEST_DIR)/test_parser.c
 EXAMPLE_FILES = $(EXAMPLES_DIR)/example_usage.c
 
@@ -91,6 +93,7 @@ $(BUILD_DIR)/%.o: $(TEST_DIR)/%.c
 
 # Build and run example
 example: $(STATIC_LIB) $(EXAMPLE_OBJ_FILES)
+	mkdir -p $(BIN_DIR)
 	$(CC) $(CFLAGS) $(EXAMPLE_OBJ_FILES) $(STATIC_LIB) -o $(EXAMPLE_TARGET)
 	./$(EXAMPLE_TARGET)
 
@@ -100,7 +103,7 @@ $(BUILD_DIR)/%.o: $(EXAMPLES_DIR)/%.c
 
 # Clean build artifacts
 clean:
-	rm -rf $(BUILD_DIR)
+	rm -rf $(BUILD_DIR) $(BIN_DIR)
 
 # Help target to display usage information
 help:
