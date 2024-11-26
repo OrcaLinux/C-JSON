@@ -27,7 +27,7 @@ BUILD_DIR = build
 BIN_DIR = bin
 
 # Source files
-# Updated to include all .c files in src/
+# Use wildcard to include all .c files in src/
 SRC_FILES = $(wildcard $(SRC_DIR)/*.c)
 TEST_FILES = $(TEST_DIR)/test_parser.c
 EXAMPLE_FILES = $(EXAMPLES_DIR)/example_usage.c

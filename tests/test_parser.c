@@ -1,105 +1,159 @@
+// tests/test_parser.c
+
 #include "json_parser.h"
+#include "json_accessor.h"
 #include <assert.h>
 #include <stdio.h>
 #include <string.h>
 
+/**
+ * @brief Tests parsing of an empty JSON object.
+ */
 void test_parse_empty_object()
 {
     const char *json = "{ }";
     JsonValue *value = json_parse(json);
     assert(value != NULL);
     assert(value->type == JSON_OBJECT);
-    assert(value->object->size == 0);
+    assert(value->value.object->count == 0);
     json_free_value(value);
+    printf("test_parse_empty_object passed.\n");
 }
 
+/**
+ * @brief Tests parsing of an empty JSON array.
+ */
 void test_parse_empty_array()
 {
     const char *json = "[]";
     JsonValue *value = json_parse(json);
     assert(value != NULL);
     assert(value->type == JSON_ARRAY);
-    assert(value->array->size == 0);
+    assert(value->value.array->count == 0);
     json_free_value(value);
+    printf("test_parse_empty_array passed.\n");
 }
 
+/**
+ * @brief Tests parsing of nested JSON structures.
+ */
 void test_parse_nested_structures()
 {
     const char *json = "{ \"user\": { \"id\": 1, \"name\": \"John\" }, \"roles\": [\"admin\", \"user\"] }";
     JsonValue *value = json_parse(json);
     assert(value != NULL);
     assert(value->type == JSON_OBJECT);
-    assert(value->object->size == 2);
-    // Further assertions...
+    assert(value->value.object->count == 2);
+
+    // Check "user" object
+    JsonValue *user = json_get_object(value, "user");
+    assert(user != NULL);
+    assert(user->type == JSON_OBJECT);
+    assert(user->value.object->count == 2);
+
+    // Check "id"
+    const char *id_key = "id";
+    double id = json_get_number(user, id_key);
+    assert(id == 1);
+
+    // Check "name"
+    const char *name_key = "name";
+    const char *name = json_get_string(user, name_key);
+    assert(name != NULL);
+    assert(strcmp(name, "John") == 0);
+
+    // Check "roles" array
+    JsonValue *roles = json_get_array(value, "roles");
+    assert(roles != NULL);
+    assert(roles->type == JSON_ARRAY);
+    assert(roles->value.array->count == 2);
+
+    // Accessing array elements as pointers
+    const char *role1 = json_get_string(roles->value.array->items[0], NULL);
+    const char *role2 = json_get_string(roles->value.array->items[1], NULL);
+    assert(role1 != NULL && strcmp(role1, "admin") == 0);
+    assert(role2 != NULL && strcmp(role2, "user") == 0);
+
     json_free_value(value);
+    printf("test_parse_nested_structures passed.\n");
 }
 
+/**
+ * @brief Tests parsing of a simple JSON object.
+ */
 void test_parse_simple_object()
 {
     const char *json = "{ \"key\": \"value\" }";
     JsonValue *value = json_parse(json);
     assert(value != NULL);
     assert(value->type == JSON_OBJECT);
-    assert(value->object->size == 1);
-    assert(strcmp(value->object->pairs[0].key, "key") == 0);
-    assert(value->object->pairs[0].value->type == JSON_STRING);
-    assert(strcmp(value->object->pairs[0].value->string, "value") == 0);
+    assert(value->value.object->count == 1);
+    assert(strcmp(value->value.object->pairs[0].key, "key") == 0);
+    assert(value->value.object->pairs[0].value->type == JSON_STRING);
+    assert(strcmp(value->value.object->pairs[0].value->value.string, "value") == 0);
     json_free_value(value);
+    printf("test_parse_simple_object passed.\n");
 }
 
+/**
+ * @brief Tests parsing of a JSON array with numbers.
+ */
 void test_parse_array()
 {
     const char *json = "[1, 2, 3]";
     JsonValue *value = json_parse(json);
     assert(value != NULL);
     assert(value->type == JSON_ARRAY);
-    assert(value->array->size == 3);
-    assert(value->array->values[0]->type == JSON_NUMBER && value->array->values[0]->number == 1);
-    assert(value->array->values[1]->type == JSON_NUMBER && value->array->values[1]->number == 2);
-    assert(value->array->values[2]->type == JSON_NUMBER && value->array->values[2]->number == 3);
+    assert(value->value.array->count == 3);
+    assert(value->value.array->items[0]->type == JSON_NUMBER && value->value.array->items[0]->value.number == 1);
+    assert(value->value.array->items[1]->type == JSON_NUMBER && value->value.array->items[1]->value.number == 2);
+    assert(value->value.array->items[2]->type == JSON_NUMBER && value->value.array->items[2]->value.number == 3);
     json_free_value(value);
+    printf("test_parse_array passed.\n");
 }
 
+/**
+ * @brief Tests parsing of nested JSON objects and arrays.
+ */
 void test_parse_nested()
 {
     const char *json = "{ \"person\": { \"name\": \"Alice\", \"age\": 25 }, \"hobbies\": [\"reading\", \"swimming\"] }";
     JsonValue *value = json_parse(json);
     assert(value != NULL);
     assert(value->type == JSON_OBJECT);
-    assert(value->object->size == 2);
+    assert(value->value.object->count == 2);
 
-    // Check "person"
-    JsonPair *person_pair = &value->object->pairs[0];
-    assert(strcmp(person_pair->key, "person") == 0);
-    assert(person_pair->value->type == JSON_OBJECT);
-    assert(person_pair->value->object->size == 2);
+    // Check "person" object
+    JsonValue *person = json_get_object(value, "person");
+    assert(person != NULL);
+    assert(person->type == JSON_OBJECT);
+    assert(person->value.object->count == 2);
 
     // Check "name" within "person"
-    JsonPair *name_pair = &person_pair->value->object->pairs[0];
-    assert(strcmp(name_pair->key, "name") == 0);
-    assert(name_pair->value->type == JSON_STRING);
-    assert(strcmp(name_pair->value->string, "Alice") == 0);
+    const char *name_key = "name";
+    const char *name = json_get_string(person, name_key);
+    assert(name != NULL);
+    assert(strcmp(name, "Alice") == 0);
 
     // Check "age" within "person"
-    JsonPair *age_pair = &person_pair->value->object->pairs[1];
-    assert(strcmp(age_pair->key, "age") == 0);
-    assert(age_pair->value->type == JSON_NUMBER);
-    assert(age_pair->value->number == 25);
+    const char *age_key = "age";
+    double age = json_get_number(person, age_key);
+    assert(age == 25);
 
-    // Check "hobbies"
-    JsonPair *hobbies_pair = &value->object->pairs[1];
-    assert(strcmp(hobbies_pair->key, "hobbies") == 0);
-    assert(hobbies_pair->value->type == JSON_ARRAY);
-    assert(hobbies_pair->value->array->size == 2);
+    // Check "hobbies" array
+    JsonValue *hobbies = json_get_array(value, "hobbies");
+    assert(hobbies != NULL);
+    assert(hobbies->type == JSON_ARRAY);
+    assert(hobbies->value.array->count == 2);
 
     // Accessing array elements as pointers
-    assert(hobbies_pair->value->array->values[0]->type == JSON_STRING);
-    assert(strcmp(hobbies_pair->value->array->values[0]->string, "reading") == 0);
-
-    assert(hobbies_pair->value->array->values[1]->type == JSON_STRING);
-    assert(strcmp(hobbies_pair->value->array->values[1]->string, "swimming") == 0);
+    const char *hobby1 = json_get_string(hobbies->value.array->items[0], NULL);
+    const char *hobby2 = json_get_string(hobbies->value.array->items[1], NULL);
+    assert(hobby1 != NULL && strcmp(hobby1, "reading") == 0);
+    assert(hobby2 != NULL && strcmp(hobby2, "swimming") == 0);
 
     json_free_value(value);
+    printf("test_parse_nested passed.\n");
 }
 
 int main()

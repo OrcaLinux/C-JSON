@@ -36,28 +36,6 @@ static void parser_advance(ParserState *state)
 }
 
 /**
- * @brief Expects the current token to be of a specific type and consumes it.
- *
- * If the current token matches the expected type, the parser advances to the next token.
- * Otherwise, it reports an error and terminates parsing.
- *
- * @param[in,out] state Pointer to the ParserState instance.
- * @param[in]     type  The expected JsonTokenType.
- */
-static void parser_expect(ParserState *state, JsonTokenType type)
-{
-    if (state->current_token.type != type)
-    {
-        fprintf(stderr, "Parser Error: Expected token %s but found %s\n",
-                json_token_type_to_string(type),
-                json_token_type_to_string(state->current_token.type));
-        json_token_free(&state->current_token);
-        exit(EXIT_FAILURE);
-    }
-    parser_advance(state);
-}
-
-/**
  * @brief Parses a JSON string token.
  *
  * This function converts a string token into a JsonValue of type JSON_STRING.
@@ -68,6 +46,7 @@ static void parser_expect(ParserState *state, JsonTokenType type)
  */
 static JsonValue *parse_string(ParserState *state, const char *str)
 {
+    (void)state;
     printf("Parser: Parsing string: '%s'\n", str);
     JsonValue *value = json_alloc(sizeof(JsonValue));
     if (!value)
@@ -97,6 +76,7 @@ static JsonValue *parse_string(ParserState *state, const char *str)
  */
 static JsonValue *parse_number(ParserState *state, const char *num_str)
 {
+    (void)state;
     printf("Parser: Parsing number: '%s'\n", num_str);
     JsonValue *value = json_alloc(sizeof(JsonValue));
     if (!value)
@@ -117,6 +97,7 @@ static JsonValue *parse_number(ParserState *state, const char *num_str)
  */
 static JsonValue *parse_true(ParserState *state)
 {
+    (void)state;
     printf("Parser: Parsing true\n");
     JsonValue *value = json_alloc(sizeof(JsonValue));
     if (!value)
@@ -137,6 +118,7 @@ static JsonValue *parse_true(ParserState *state)
  */
 static JsonValue *parse_false(ParserState *state)
 {
+    (void)state;
     printf("Parser: Parsing false\n");
     JsonValue *value = json_alloc(sizeof(JsonValue));
     if (!value)
@@ -157,6 +139,7 @@ static JsonValue *parse_false(ParserState *state)
  */
 static JsonValue *parse_null(ParserState *state)
 {
+    (void)state;
     printf("Parser: Parsing null\n");
     JsonValue *value = json_alloc(sizeof(JsonValue));
     if (!value)
