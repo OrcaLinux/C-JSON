@@ -37,7 +37,7 @@ With features like handling deeply nested structures, simple API integration, an
    Get the source code from GitHub:
 
    ```bash
-   git clone https://github.com/OrcaLinux/json-parser.git
+   git clone https://github.com/OrcaLinux/C-JSON.git
    cd json-parser
    ```
 
