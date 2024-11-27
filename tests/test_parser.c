@@ -1,5 +1,3 @@
-// tests/test_parser.c
-
 #include "json_parser.h"
 #include "json_accessor.h"
 #include <assert.h>
