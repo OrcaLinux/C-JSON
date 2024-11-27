@@ -1,12 +1,12 @@
-# **LightJSON**
+# **C-JSON**
 
-_A lightweight and efficient JSON parsing library for C applications._
+_A C-JSON and efficient JSON parsing library for C applications._
 
 ---
 
 ### **Overview**
 
-LightJSON is a minimalist yet powerful JSON parsing library designed for C developers who value performance and simplicity. Whether you are working on embedded systems, performance-critical applications, or lightweight utilities, LightJSON is your go-to solution for handling JSON data with minimal overhead.
+C-JSON is a minimalist yet powerful JSON parsing library designed for C developers who value performance and simplicity. Whether you are working on embedded systems, performance-critical applications, or C-JSON  utilities, LightJSON is your go-to solution for handling JSON data with minimal overhead.
 
 Key features include robust parsing of JSON objects, arrays, strings, numbers, booleans, and null values. With support for nested structures and a small memory footprint, LightJSON ensures your applications stay efficient while offering full JSON compatibility.
 
@@ -14,7 +14,7 @@ Key features include robust parsing of JSON objects, arrays, strings, numbers, b
 
 ## **Features**
 
-- **Lightweight & Fast**: Designed with performance and resource efficiency in mind.
+- **C-JSON  & Fast**: Designed with performance and resource efficiency in mind.
 - **Robust Parsing**: Supports:
   - JSON Objects
   - Arrays
@@ -216,5 +216,5 @@ This project is licensed under the MIT License. See the `LICENSE` file for detai
 
 ## **Acknowledgments**
 
-- Inspired by the simplicity of JSON and the need for lightweight tools in C.
+- Inspired by the simplicity of JSON and the need for C-JSON  tools in C.
 - Special thanks to contributors and the open-source community.
