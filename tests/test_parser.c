@@ -68,9 +68,9 @@ void test_parse_nested_structures()
     assert(roles->type == JSON_ARRAY);
     assert(roles->value.array->count == 2);
 
-    // Accessing array elements as pointers
-    const char *role1 = json_get_string(roles->value.array->items[0], NULL);
-    const char *role2 = json_get_string(roles->value.array->items[1], NULL);
+    // Accessing array elements directly
+    const char *role1 = roles->value.array->items[0]->value.string;
+    const char *role2 = roles->value.array->items[1]->value.string;
     assert(role1 != NULL && strcmp(role1, "admin") == 0);
     assert(role2 != NULL && strcmp(role2, "user") == 0);
 
@@ -146,9 +146,9 @@ void test_parse_nested()
     assert(hobbies->type == JSON_ARRAY);
     assert(hobbies->value.array->count == 2);
 
-    // Accessing array elements as pointers
-    const char *hobby1 = json_get_string(hobbies->value.array->items[0], NULL);
-    const char *hobby2 = json_get_string(hobbies->value.array->items[1], NULL);
+    // Accessing array elements directly
+    const char *hobby1 = hobbies->value.array->items[0]->value.string;
+    const char *hobby2 = hobbies->value.array->items[1]->value.string;
     assert(hobby1 != NULL && strcmp(hobby1, "reading") == 0);
     assert(hobby2 != NULL && strcmp(hobby2, "swimming") == 0);
 
