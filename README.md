@@ -38,7 +38,7 @@ With features like handling deeply nested structures, simple API integration, an
 
    ```bash
    git clone https://github.com/OrcaLinux/C-JSON.git
-   cd json-parser
+   cd c-json
    ```
 
 2. **Build the Library**  
