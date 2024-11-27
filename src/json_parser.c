@@ -36,6 +36,29 @@ static void parser_advance(ParserState *state)
 }
 
 /**
+ * @brief Expects the current token to be of a specific type and consumes it.
+ *
+ * If the current token matches the expected type, the parser advances to the next token.
+ * Otherwise, it reports an error and terminates parsing.
+ *
+ * @param[in,out] state Pointer to the ParserState instance.
+ * @param[in]     type  The expected JsonTokenType.
+ */
+static void parser_expect(ParserState *state, JsonTokenType type)
+{
+    if (state->current_token.type != type)
+    {
+        fprintf(stderr, "Parser Error at position %zu: Expected token %s but found %s\n",
+                state->tokenizer.pos,
+                json_token_type_to_string(type),
+                json_token_type_to_string(state->current_token.type));
+        json_free_value(NULL); // Adjust based on your cleanup strategy
+        exit(EXIT_FAILURE);
+    }
+    parser_advance(state); // Consume the expected token
+}
+
+/**
  * @brief Parses a JSON string token.
  *
  * This function converts a string token into a JsonValue of type JSON_STRING.
@@ -193,14 +216,7 @@ static JsonValue *parse_object(ParserState *state)
         // If not the first key-value pair, expect a comma
         if (object->value.object->count > 0)
         {
-            if (state->current_token.type != TOKEN_COMMA)
-            {
-                fprintf(stderr, "Parser: Expected TOKEN_COMMA between key-value pairs, but got %s\n",
-                        json_token_type_to_string(state->current_token.type));
-                json_free_value(object);
-                exit(EXIT_FAILURE);
-            }
-            parser_advance(state); // Consume the comma
+            parser_expect(state, TOKEN_COMMA); // Consume the comma
         }
 
         // Now, expect a key string
@@ -272,7 +288,7 @@ static JsonValue *parse_object(ParserState *state)
  * This function handles parsing of JSON arrays, which are ordered lists of JSON values.
  *
  * @param[in,out] state Pointer to the ParserState instance.
- * @return Pointer to the parsed JsonArray, or NULL on failure.
+ * @return Pointer to the parsed JsonValue (ARRAY), or NULL on failure.
  */
 static JsonValue *parse_array(ParserState *state)
 {
@@ -301,21 +317,14 @@ static JsonValue *parse_array(ParserState *state)
         if (state->current_token.type == TOKEN_RIGHT_BRACKET)
         {
             printf("Parser: Array parsing complete.\n");
-            parser_advance(state);
+            parser_advance(state); // Consume ']'
             break;
         }
 
         // If not the first element, expect a comma
         if (array->value.array->count > 0)
         {
-            if (state->current_token.type != TOKEN_COMMA)
-            {
-                fprintf(stderr, "Parser: Expected TOKEN_COMMA between array elements, but got %s\n",
-                        json_token_type_to_string(state->current_token.type));
-                json_free_value(array);
-                exit(EXIT_FAILURE);
-            }
-            parser_advance(state); // Consume the comma
+            parser_expect(state, TOKEN_COMMA); // Ensures a comma is present and consumes it
         }
 
         // Parse value
