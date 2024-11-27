@@ -1,31 +1,31 @@
 # **C-JSON**
 
-_A C-JSON and efficient JSON parsing library for C applications._
+_A lightweight and efficient JSON parsing library for C applications._
 
 ---
 
-### **Overview**
+## **Overview**
 
-C-JSON is a minimalist yet powerful JSON parsing library designed for C developers who value performance and simplicity. Whether you are working on embedded systems, performance-critical applications, or C-JSON  utilities, LightJSON is your go-to solution for handling JSON data with minimal overhead.
+C-JSON is a minimal yet robust JSON parsing library designed for developers who need fast and efficient JSON handling in C. Whether you're building embedded systems, working on performance-critical applications, or integrating JSON into your C projects, C-JSON provides the tools you need with minimal overhead.
 
-Key features include robust parsing of JSON objects, arrays, strings, numbers, booleans, and null values. With support for nested structures and a small memory footprint, LightJSON ensures your applications stay efficient while offering full JSON compatibility.
+With features like handling deeply nested structures, simple API integration, and comprehensive error handling, C-JSON ensures a smooth experience while processing JSON data efficiently.
 
 ---
 
 ## **Features**
 
-- **C-JSON  & Fast**: Designed with performance and resource efficiency in mind.
-- **Robust Parsing**: Supports:
+- **Lightweight and Fast**: Built for performance and low memory usage.
+- **Comprehensive Parsing**:
   - JSON Objects
   - Arrays
   - Strings
-  - Numbers (including integers and floats)
-  - Boolean values
+  - Numbers (integers and floating-point)
+  - Booleans
   - Null values
-- **Handles Nesting**: Parse and access deeply nested JSON structures with ease.
-- **Simple API**: Intuitive and easy-to-use interface for seamless integration.
-- **Error Handling**: Provides clear error feedback for malformed JSON strings.
-- **Cross-Platform**: Compatible with any C compiler on Linux, macOS, and Windows.
+- **Supports Nested Structures**: Handles deeply nested objects and arrays effortlessly.
+- **Intuitive API**: Easy-to-use functions for seamless integration.
+- **Error Handling**: Identifies and reports malformed JSON with helpful messages.
+- **Cross-Platform**: Compatible with Linux, macOS, and Windows.
 
 ---
 
@@ -34,28 +34,30 @@ Key features include robust parsing of JSON objects, arrays, strings, numbers, b
 ### **Installation**
 
 1. **Clone the Repository**  
-   Download the source code from GitHub:
+   Get the source code from GitHub:
 
    ```bash
    git clone https://github.com/OrcaLinux/json-parser.git
-   cd lightjson
+   cd json-parser
    ```
 
 2. **Build the Library**  
-   Compile the library using `make`:
+   Compile the library using the provided Makefile:
 
    ```bash
    make
    ```
 
 3. **Run Tests**  
-   Ensure everything is working as expected:
+   Verify that the library is functioning as expected:
 
    ```bash
    make test
    ```
 
-### **Adding LightJSON to Your Project**
+---
+
+### **Integration**
 
 1. Include the header file in your source code:
 
@@ -63,17 +65,15 @@ Key features include robust parsing of JSON objects, arrays, strings, numbers, b
    #include "json_parser.h"
    ```
 
-2. Link the compiled library (`libjsonparser.a`) to your project during compilation:
+2. Link the library during compilation:
 
    ```bash
-   gcc -o my_program my_program.c -Lpath/to/lightjson/build -ljsonparser
+   gcc -o my_program my_program.c -Lpath/to/json-parser/build -ljsonparser
    ```
 
 ---
 
 ## **Usage**
-
-LightJSON simplifies JSON parsing into just a few function calls. Here's a practical example:
 
 ### **Example: Parsing a Simple JSON Object**
 
@@ -82,10 +82,10 @@ LightJSON simplifies JSON parsing into just a few function calls. Here's a pract
 #include <stdio.h>
 
 int main() {
-    const char* json_str = "{ \"name\": \"LightJSON\", \"version\": 1.0, \"active\": true }";
+    const char* json_str = "{ \"name\": \"C-JSON\", \"version\": 1.0, \"active\": true }";
 
     JsonValue* root = json_parse(json_str);
-    if (root == NULL) {
+    if (!root) {
         printf("Failed to parse JSON.\n");
         return 1;
     }
@@ -95,12 +95,12 @@ int main() {
     JsonValue* version = json_object_get(root, "version");
     JsonValue* active = json_object_get(root, "active");
 
-    if (name != NULL && name->type == JSON_STRING)
-        printf("Name: %s\n", name->string);
-    if (version != NULL && version->type == JSON_NUMBER)
-        printf("Version: %.1f\n", version->number);
-    if (active != NULL && active->type == JSON_BOOL)
-        printf("Active: %s\n", active->boolean ? "true" : "false");
+    if (name && name->type == JSON_STRING)
+        printf("Name: %s\n", name->value.string);
+    if (version && version->type == JSON_NUMBER)
+        printf("Version: %.1f\n", version->value.number);
+    if (active && active->type == JSON_BOOL)
+        printf("Active: %s\n", active->value.boolean ? "true" : "false");
 
     json_free_value(root);
     return 0;
@@ -109,11 +109,7 @@ int main() {
 
 ---
 
-## **Advanced Usage**
-
-### **Example: Parsing Nested Structures**
-
-LightJSON handles complex and deeply nested JSON effortlessly:
+### **Example: Handling Nested Structures**
 
 ```c
 #include "json_parser.h"
@@ -135,19 +131,19 @@ int main() {
         JsonValue* age = json_object_get(user, "age");
 
         if (name && name->type == JSON_STRING)
-            printf("Name: %s\n", name->string);
+            printf("Name: %s\n", name->value.string);
         if (age && age->type == JSON_NUMBER)
-            printf("Age: %.0f\n", age->number);
+            printf("Age: %.0f\n", age->value.number);
     }
 
     // Access arrays
     JsonValue* hobbies = json_object_get(root, "hobbies");
     if (hobbies && hobbies->type == JSON_ARRAY) {
         printf("Hobbies:\n");
-        for (size_t i = 0; i < hobbies->array->size; i++) {
-            JsonValue* hobby = hobbies->array->values[i];
+        for (size_t i = 0; i < hobbies->value.array->count; i++) {
+            JsonValue* hobby = hobbies->value.array->items[i];
             if (hobby && hobby->type == JSON_STRING)
-                printf("- %s\n", hobby->string);
+                printf("- %s\n", hobby->value.string);
         }
     }
 
@@ -161,50 +157,59 @@ int main() {
 ## **Directory Structure**
 
 ```
-lightjson/
+.
+├── examples/
+│   └── example_usage.c      # Example application showcasing library usage
 ├── include/
-│   └── json_parser.h      # Public header file
+│   ├── json_accessor.h      # JSON accessor API header
+│   ├── json_parser.h        # Main parser API header
+│   ├── json_printer.h       # JSON pretty-printing API header
+│   ├── json_tokenizer.h     # Tokenizer API header
+│   ├── json_types.h         # JSON type definitions
+│   └── json_utils.h         # Utility functions header
+├── LICENSE                  # Project license
+├── Makefile                 # Build instructions
+├── README.md                # Project documentation
 ├── src/
-│   ├── json_parser.c      # Main parser implementation
-│   ├── json_tokenizer.c   # Tokenizer for JSON strings
-│   ├── json_utils.c       # Utility functions
-├── tests/
-│   ├── test_parser.c      # Unit tests for parser
-│   ├── test_tokenizer.c   # Unit tests for tokenizer
-├── build/                 # Compiled library and object files (generated by make)
-├── Makefile               # Build system configuration
-└── README.md              # Project documentation
+│   ├── json_accessor.c      # Implementation of accessor functions
+│   ├── json_parser.c        # Implementation of the JSON parser
+│   ├── json_printer.c       # Implementation of the JSON printer
+│   ├── json_tokenizer.c     # Implementation of the tokenizer
+│   └── json_utils.c         # Implementation of utility functions
+└── tests/
+    ├── test_parser.c        # Unit tests for the JSON parser
+    └── test_tokenizer.c     # Unit tests for the tokenizer
 ```
 
 ---
 
 ## **Contributing**
 
-Contributions are welcome and encouraged! Here's how you can contribute:
+Contributions are welcome! To contribute:
 
 1. Fork the repository.
-2. Create a branch for your feature or bug fix:
+2. Create a feature branch:
    ```bash
    git checkout -b feature/AmazingFeature
    ```
-3. Commit your changes with a descriptive message:
+3. Commit your changes:
    ```bash
-   git commit -m "Add AmazingFeature to improve performance"
+   git commit -m "Add AmazingFeature"
    ```
-4. Push your branch to GitHub:
+4. Push your branch:
    ```bash
    git push origin feature/AmazingFeature
    ```
-5. Open a pull request and describe your changes.
+5. Open a pull request.
 
 ---
 
 ## **Roadmap**
 
-- [ ] Add support for JSON serialization.
-- [ ] Optimize memory usage for large JSON files.
-- [ ] Provide benchmarks comparing parsing speed with other libraries.
-- [ ] Expand error handling with detailed error messages.
+- [ ] Add JSON serialization support.
+- [ ] Optimize parsing for large JSON files.
+- [ ] Add detailed error reporting.
+- [ ] Include performance benchmarks.
 
 ---
 
@@ -216,5 +221,5 @@ This project is licensed under the MIT License. See the `LICENSE` file for detai
 
 ## **Acknowledgments**
 
-- Inspired by the simplicity of JSON and the need for C-JSON  tools in C.
-- Special thanks to contributors and the open-source community.
+- Inspired by the simplicity and versatility of JSON.
+- Thanks to all contributors and open-source advocates.
