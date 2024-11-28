@@ -162,16 +162,20 @@ int main() {
 │   └── example_usage.c      # Example application showcasing library usage
 ├── include/
 │   ├── json_accessor.h      # JSON accessor API header
+│   ├── json_config.h        # Configuration file for JSON settings, e.g., debug flags
+│   ├── json_logging.h       # Header for logging-related macros or functions
 │   ├── json_parser.h        # Main parser API header
 │   ├── json_printer.h       # JSON pretty-printing API header
 │   ├── json_tokenizer.h     # Tokenizer API header
 │   ├── json_types.h         # JSON type definitions
-│   └── json_utils.h         # Utility functions header
+│   └── json_utils.h         # Utility functions header (memory management, etc.)
 ├── LICENSE                  # Project license
 ├── Makefile                 # Build instructions
 ├── README.md                # Project documentation
 ├── src/
 │   ├── json_accessor.c      # Implementation of accessor functions
+│   ├── json_config.c        # Implementation for configuration (if needed)
+│   ├── json_logging.c       # Implementation for logging functionality (if needed)
 │   ├── json_parser.c        # Implementation of the JSON parser
 │   ├── json_printer.c       # Implementation of the JSON printer
 │   ├── json_tokenizer.c     # Implementation of the tokenizer
