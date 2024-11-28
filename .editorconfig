@@ -1,0 +1,45 @@
+# EditorConfig is awesome: https://EditorConfig.org
+
+# Top-most EditorConfig file
+root = true
+
+# Default settings for all files
+[*]
+# Use 4 spaces for indentation
+indent_style = space
+indent_size = 4
+
+# Set the line endings to LF (Unix-style)
+end_of_line = lf
+
+# Charset: UTF-8
+charset = utf-8
+
+# Trim trailing whitespaces
+trim_trailing_whitespace = true
+
+# Ensure a final newline at the end of files
+insert_final_newline = true
+
+# Settings for C files (*.c)
+[*.c]
+# Use 4 spaces for indentation
+indent_size = 4
+
+# Enable the use of tabs in C source files (optional, can use spaces as well)
+indent_style = space
+
+# Set the maximum line length (good practice for readability)
+max_line_length = 80
+
+# Settings for header files (*.h)
+[*.h]
+# Same rules for header files as for source files
+indent_size = 4
+indent_style = space
+max_line_length = 80
+
+# Settings for Makefiles (for your build automation files)
+[Makefile]
+indent_style = tab
+indent_size = 4
