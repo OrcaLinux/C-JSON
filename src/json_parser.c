@@ -1,6 +1,7 @@
 #include "json_parser.h"
 #include "json_tokenizer.h"
 #include "json_utils.h"
+#include "json_logging.h"
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -48,10 +49,10 @@ static void parser_expect(ParserState *state, JsonTokenType type)
 {
     if (state->current_token.type != type)
     {
-        fprintf(stderr, "Parser Error at position %zu: Expected token %s but found %s\n",
-                state->tokenizer.pos,
-                json_token_type_to_string(type),
-                json_token_type_to_string(state->current_token.type));
+        ERROR_LOG("Parser Error at position %zu: Expected token %s but found %s\n",
+                  state->tokenizer.pos,
+                  json_token_type_to_string(type),
+                  json_token_type_to_string(state->current_token.type));
         json_free_value(NULL); // Adjust based on your cleanup strategy
         exit(EXIT_FAILURE);
     }
@@ -70,18 +71,18 @@ static void parser_expect(ParserState *state, JsonTokenType type)
 static JsonValue *parse_string(ParserState *state, const char *str)
 {
     (void)state;
-    printf("Parser: Parsing string: '%s'\n", str);
+    DEBUG_PRINT("Parser: Parsing string: '%s'\n", str);
     JsonValue *value = json_alloc(sizeof(JsonValue));
     if (!value)
     {
-        fprintf(stderr, "Parser: Memory allocation failed for JsonValue (STRING)\n");
+        ERROR_LOG("Parser: Memory allocation failed for JsonValue (STRING)\n");
         return NULL;
     }
     value->type = JSON_STRING;
     value->value.string = json_strdup(str);
     if (!value->value.string)
     {
-        fprintf(stderr, "Parser: Memory allocation failed for string value '%s'\n", str);
+        ERROR_LOG("Parser: Memory allocation failed for string value '%s'\n", str);
         json_free(value);
         return NULL;
     }
@@ -100,11 +101,11 @@ static JsonValue *parse_string(ParserState *state, const char *str)
 static JsonValue *parse_number(ParserState *state, const char *num_str)
 {
     (void)state;
-    printf("Parser: Parsing number: '%s'\n", num_str);
+    DEBUG_PRINT("Parser: Parsing number: '%s'\n", num_str);
     JsonValue *value = json_alloc(sizeof(JsonValue));
     if (!value)
     {
-        fprintf(stderr, "Parser: Memory allocation failed for JsonValue (NUMBER)\n");
+        ERROR_LOG("Parser: Memory allocation failed for JsonValue (NUMBER)\n");
         return NULL;
     }
     value->type = JSON_NUMBER;
@@ -121,11 +122,11 @@ static JsonValue *parse_number(ParserState *state, const char *num_str)
 static JsonValue *parse_true(ParserState *state)
 {
     (void)state;
-    printf("Parser: Parsing true\n");
+    DEBUG_PRINT("Parser: Parsing true\n");
     JsonValue *value = json_alloc(sizeof(JsonValue));
     if (!value)
     {
-        fprintf(stderr, "Parser: Memory allocation failed for JsonValue (TRUE)\n");
+        ERROR_LOG("Parser: Memory allocation failed for JsonValue (TRUE)\n");
         return NULL;
     }
     value->type = JSON_BOOL;
@@ -142,11 +143,11 @@ static JsonValue *parse_true(ParserState *state)
 static JsonValue *parse_false(ParserState *state)
 {
     (void)state;
-    printf("Parser: Parsing false\n");
+    DEBUG_PRINT("Parser: Parsing false\n");
     JsonValue *value = json_alloc(sizeof(JsonValue));
     if (!value)
     {
-        fprintf(stderr, "Parser: Memory allocation failed for JsonValue (FALSE)\n");
+        ERROR_LOG("Parser: Memory allocation failed for JsonValue (FALSE)\n");
         return NULL;
     }
     value->type = JSON_BOOL;
@@ -163,11 +164,11 @@ static JsonValue *parse_false(ParserState *state)
 static JsonValue *parse_null(ParserState *state)
 {
     (void)state;
-    printf("Parser: Parsing null\n");
+    DEBUG_PRINT("Parser: Parsing null\n");
     JsonValue *value = json_alloc(sizeof(JsonValue));
     if (!value)
     {
-        fprintf(stderr, "Parser: Memory allocation failed for JsonValue (NULL)\n");
+        ERROR_LOG("Parser: Memory allocation failed for JsonValue (NULL)\n");
         return NULL;
     }
     value->type = JSON_NULL;
@@ -184,18 +185,18 @@ static JsonValue *parse_null(ParserState *state)
  */
 static JsonValue *parse_object(ParserState *state)
 {
-    printf("Parser: Starting to parse object.\n");
+    DEBUG_PRINT("Parser: Starting to parse object.\n");
     JsonValue *object = json_alloc(sizeof(JsonValue));
     if (!object)
     {
-        fprintf(stderr, "Parser: Memory allocation failed for JsonValue (OBJECT)\n");
+        ERROR_LOG("Parser: Memory allocation failed for JsonValue (OBJECT)\n");
         return NULL;
     }
     object->type = JSON_OBJECT;
     object->value.object = json_alloc(sizeof(JsonObject));
     if (!object->value.object)
     {
-        fprintf(stderr, "Parser: Memory allocation failed for JsonObject\n");
+        ERROR_LOG("Parser: Memory allocation failed for JsonObject\n");
         json_free(object);
         return NULL;
     }
@@ -208,7 +209,7 @@ static JsonValue *parse_object(ParserState *state)
     {
         if (state->current_token.type == TOKEN_RIGHT_BRACE)
         {
-            printf("Parser: Object parsing complete.\n");
+            DEBUG_PRINT("Parser: Object parsing complete.\n");
             parser_advance(state);
             break;
         }
@@ -222,8 +223,8 @@ static JsonValue *parse_object(ParserState *state)
         // Now, expect a key string
         if (state->current_token.type != TOKEN_STRING)
         {
-            fprintf(stderr, "Parser: Expected TOKEN_STRING for key, but got %s\n",
-                    json_token_type_to_string(state->current_token.type));
+            ERROR_LOG("Parser: Expected TOKEN_STRING for key, but got %s\n",
+                      json_token_type_to_string(state->current_token.type));
             json_free_value(object);
             exit(EXIT_FAILURE);
         }
@@ -232,30 +233,30 @@ static JsonValue *parse_object(ParserState *state)
         char *key = json_strdup(state->current_token.value);
         if (!key)
         {
-            fprintf(stderr, "Parser: Memory allocation failed for key '%s'\n", state->current_token.value);
+            ERROR_LOG("Parser: Memory allocation failed for key '%s'\n", state->current_token.value);
             json_free_value(object);
             exit(EXIT_FAILURE);
         }
-        printf("Parser: Object key: '%s'\n", key);
+        DEBUG_PRINT("Parser: Object key: '%s'\n", key);
         parser_advance(state); // Consume the string token
 
         // Expect colon
         if (state->current_token.type != TOKEN_COLON)
         {
-            fprintf(stderr, "Parser: Expected TOKEN_COLON after key '%s', but got %s\n",
-                    key, json_token_type_to_string(state->current_token.type));
+            ERROR_LOG("Parser: Expected TOKEN_COLON after key '%s', but got %s\n",
+                      key, json_token_type_to_string(state->current_token.type));
             json_free(key);
             json_free_value(object);
             exit(EXIT_FAILURE);
         }
         parser_advance(state); // Consume the colon
-        printf("Parser: Successfully processed colon. Parsing value for key: '%s'\n", key);
+        DEBUG_PRINT("Parser: Successfully processed colon. Parsing value for key: '%s'\n", key);
 
         // Parse value
         JsonValue *value = parse_value(state);
         if (!value)
         {
-            fprintf(stderr, "Parser: Failed to parse value for key '%s'\n", key);
+            ERROR_LOG("Parser: Failed to parse value for key '%s'\n", key);
             json_free(key);
             json_free_value(object);
             exit(EXIT_FAILURE);
@@ -265,7 +266,7 @@ static JsonValue *parse_object(ParserState *state)
         JsonPair *new_pairs = json_realloc(object->value.object->pairs, sizeof(JsonPair) * (object->value.object->count + 1));
         if (!new_pairs)
         {
-            fprintf(stderr, "Parser: Memory allocation failed for JsonPair array.\n");
+            ERROR_LOG("Parser: Memory allocation failed for JsonPair array.\n");
             json_free(key);
             json_free_value(value);
             json_free_value(object);
@@ -276,7 +277,7 @@ static JsonValue *parse_object(ParserState *state)
         object->value.object->pairs[object->value.object->count].value = value;
         object->value.object->count++;
 
-        printf("Parser: Added key-value pair: '%s': <value>\n", key);
+        DEBUG_PRINT("Parser: Added key-value pair: '%s': <value>\n", key);
     }
 
     return object;
@@ -292,18 +293,18 @@ static JsonValue *parse_object(ParserState *state)
  */
 static JsonValue *parse_array(ParserState *state)
 {
-    printf("Parser: Starting to parse array.\n");
+    DEBUG_PRINT("Parser: Starting to parse array.\n");
     JsonValue *array = json_alloc(sizeof(JsonValue));
     if (!array)
     {
-        fprintf(stderr, "Parser: Memory allocation failed for JsonValue (ARRAY)\n");
+        ERROR_LOG("Parser: Memory allocation failed for JsonValue (ARRAY)\n");
         return NULL;
     }
     array->type = JSON_ARRAY;
     array->value.array = json_alloc(sizeof(JsonArray));
     if (!array->value.array)
     {
-        fprintf(stderr, "Parser: Memory allocation failed for JsonArray\n");
+        ERROR_LOG("Parser: Memory allocation failed for JsonArray\n");
         json_free(array);
         return NULL;
     }
@@ -316,7 +317,7 @@ static JsonValue *parse_array(ParserState *state)
     {
         if (state->current_token.type == TOKEN_RIGHT_BRACKET)
         {
-            printf("Parser: Array parsing complete.\n");
+            DEBUG_PRINT("Parser: Array parsing complete.\n");
             parser_advance(state); // Consume ']'
             break;
         }
@@ -331,7 +332,7 @@ static JsonValue *parse_array(ParserState *state)
         JsonValue *value = parse_value(state);
         if (!value)
         {
-            fprintf(stderr, "Parser: Failed to parse value in array.\n");
+            ERROR_LOG("Parser: Failed to parse value in array.\n");
             json_free_value(array);
             exit(EXIT_FAILURE);
         }
@@ -340,7 +341,7 @@ static JsonValue *parse_array(ParserState *state)
         JsonValue **new_items = json_realloc(array->value.array->items, sizeof(JsonValue *) * (array->value.array->count + 1));
         if (!new_items)
         {
-            fprintf(stderr, "Parser: Memory allocation failed for JsonArray items.\n");
+            ERROR_LOG("Parser: Memory allocation failed for JsonArray items.\n");
             json_free_value(value);
             json_free_value(array);
             exit(EXIT_FAILURE);
@@ -349,7 +350,7 @@ static JsonValue *parse_array(ParserState *state)
         array->value.array->items[array->value.array->count] = value;
         array->value.array->count++;
 
-        printf("Parser: Added value to array.\n");
+        DEBUG_PRINT("Parser: Added value to array.\n");
     }
 
     return array;
@@ -366,49 +367,49 @@ static JsonValue *parse_array(ParserState *state)
  */
 static JsonValue *parse_value(ParserState *state)
 {
-    printf("Parser: Entering parse_value. Current token: %s\n", json_token_type_to_string(state->current_token.type));
+    DEBUG_PRINT("Parser: Entering parse_value. Current token: %s\n", json_token_type_to_string(state->current_token.type));
     JsonValue *value = NULL;
 
     switch (state->current_token.type)
     {
     case TOKEN_LEFT_BRACE:
-        printf("Parser: Detected object.\n");
+        DEBUG_PRINT("Parser: Detected object.\n");
         parser_advance(state); // Consume TOKEN_LEFT_BRACE
         value = parse_object(state);
         break;
     case TOKEN_LEFT_BRACKET:
-        printf("Parser: Detected array.\n");
+        DEBUG_PRINT("Parser: Detected array.\n");
         parser_advance(state); // Consume TOKEN_LEFT_BRACKET
         value = parse_array(state);
         break;
     case TOKEN_STRING:
-        printf("Parser: Detected string '%s'\n", state->current_token.value);
+        DEBUG_PRINT("Parser: Detected string '%s'\n", state->current_token.value);
         value = parse_string(state, state->current_token.value);
         parser_advance(state); // Consume TOKEN_STRING
         break;
     case TOKEN_NUMBER:
-        printf("Parser: Detected number '%s'\n", state->current_token.value);
+        DEBUG_PRINT("Parser: Detected number '%s'\n", state->current_token.value);
         value = parse_number(state, state->current_token.value);
         parser_advance(state); // Consume TOKEN_NUMBER
         break;
     case TOKEN_TRUE:
-        printf("Parser: Detected true.\n");
+        DEBUG_PRINT("Parser: Detected true.\n");
         value = parse_true(state);
         parser_advance(state); // Consume TOKEN_TRUE
         break;
     case TOKEN_FALSE:
-        printf("Parser: Detected false.\n");
+        DEBUG_PRINT("Parser: Detected false.\n");
         value = parse_false(state);
         parser_advance(state); // Consume TOKEN_FALSE
         break;
     case TOKEN_NULL:
-        printf("Parser: Detected null.\n");
+        DEBUG_PRINT("Parser: Detected null.\n");
         value = parse_null(state);
         parser_advance(state); // Consume TOKEN_NULL
         break;
     default:
-        fprintf(stderr, "Parser Error: Unexpected token %s while parsing value.\n",
-                json_token_type_to_string(state->current_token.type));
+        ERROR_LOG("Parser Error: Unexpected token %s while parsing value.\n",
+                  json_token_type_to_string(state->current_token.type));
         exit(EXIT_FAILURE);
     }
 
@@ -423,7 +424,7 @@ static JsonValue *parse_value(ParserState *state)
  */
 JsonValue *json_parse(const char *json)
 {
-    printf("Parser: Starting JSON parsing...\n");
+    DEBUG_PRINT("Parser: Starting JSON parsing...\n");
     ParserState state;
     json_tokenizer_init(&state.tokenizer, json);
     state.current_token = json_get_next_token(&state.tokenizer);
@@ -433,18 +434,18 @@ JsonValue *json_parse(const char *json)
     {
         if (state.current_token.type != TOKEN_EOF)
         {
-            fprintf(stderr, "Parser Error: Extra data detected after JSON root.\n");
+            ERROR_LOG("Parser Error: Extra data detected after JSON root.\n");
             json_free_value(root);
             root = NULL;
         }
         else
         {
-            printf("Parser: JSON parsing completed successfully.\n");
+            DEBUG_PRINT("Parser: JSON parsing completed successfully.\n");
         }
     }
     else
     {
-        fprintf(stderr, "Parser: Failed to parse JSON.\n");
+        ERROR_LOG("Parser: Failed to parse JSON.\n");
     }
 
     json_token_free(&state.current_token);
@@ -492,7 +493,7 @@ void json_free_value(JsonValue *value)
         /* No additional memory to free */
         break;
     default:
-        fprintf(stderr, "Parser Error: Unknown JsonType encountered during free.\n");
+        ERROR_LOG("Parser Error: Unknown JsonType encountered during free.\n");
         break;
     }
 
