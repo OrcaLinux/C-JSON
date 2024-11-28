@@ -27,37 +27,29 @@ BUILD_DIR = build
 BIN_DIR = bin
 
 # Source files
-# Use wildcard to include all .c files in src/
 SRC_FILES = $(wildcard $(SRC_DIR)/*.c)
 TEST_FILES = $(TEST_DIR)/test_parser.c
-EXAMPLE_FILES = $(EXAMPLES_DIR)/example_usage.c
+
+# Variables for examples
+EXAMPLE_FILE ?= example_usage.c
+EXAMPLE_SOURCE = $(EXAMPLES_DIR)/$(EXAMPLE_FILE)
+EXAMPLE_OBJECT = $(BUILD_DIR)/$(EXAMPLE_FILE:.c=.o)
+EXAMPLE_TARGET = $(BUILD_DIR)/$(EXAMPLE_FILE:.c=)
 
 # Object files
 OBJ_FILES = $(patsubst $(SRC_DIR)/%.c, $(BUILD_DIR)/%.o, $(SRC_FILES))
 TEST_OBJ_FILES = $(patsubst $(TEST_DIR)/%.c, $(BUILD_DIR)/%.o, $(TEST_FILES))
-EXAMPLE_OBJ_FILES = $(patsubst $(EXAMPLES_DIR)/%.c, $(BUILD_DIR)/%.o, $(EXAMPLE_FILES))
 
 # Targets for static and shared libraries
 STATIC_LIB = $(BUILD_DIR)/libjsonparser.a
 SHARED_LIB = $(BUILD_DIR)/libjsonparser.so
 TEST_TARGET = $(BUILD_DIR)/test_parser
-EXAMPLE_TARGET = $(BUILD_DIR)/example_usage
 
-# New Variables for Dynamic Test Selection
-# ----------------------------------------------------
-# TEST_FILE: Name of the test file without the .c extension
-# Default is 'test_parser', but can be overridden via command line
+# Variables for Dynamic Test Selection
 TEST_FILE ?= test_parser
-
-# TEST_SOURCE: Path to the test source file
 TEST_SOURCE = $(TEST_DIR)/$(TEST_FILE).c
-
-# TEST_OBJ: Path to the compiled test object file
 TEST_OBJ = $(BUILD_DIR)/$(TEST_FILE).o
-
-# TEST_EXEC: Path to the compiled test executable
 TEST_EXEC = $(BUILD_DIR)/$(TEST_FILE)
-# ----------------------------------------------------
 
 # Default target: build static or shared library based on LIB_TYPE
 all: $(LIB_TYPE)
@@ -92,11 +84,12 @@ $(BUILD_DIR)/%.o: $(TEST_DIR)/%.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 # Build and run example
-example: $(STATIC_LIB) $(EXAMPLE_OBJ_FILES)
+example: $(STATIC_LIB) $(EXAMPLE_OBJECT)
 	mkdir -p $(BIN_DIR)
-	$(CC) $(CFLAGS) $(EXAMPLE_OBJ_FILES) $(STATIC_LIB) -o $(EXAMPLE_TARGET)
+	$(CC) $(CFLAGS) $(EXAMPLE_OBJECT) $(STATIC_LIB) -o $(EXAMPLE_TARGET)
 	./$(EXAMPLE_TARGET)
 
+# Rule for building example object files
 $(BUILD_DIR)/%.o: $(EXAMPLES_DIR)/%.c
 	mkdir -p $(BUILD_DIR)
 	$(CC) $(CFLAGS) -c $< -o $@
@@ -113,8 +106,19 @@ help:
 	@echo "  make shared                Build shared library"
 	@echo "  make test                  Run the default test (test_parser)"
 	@echo "  make test TEST_FILE=<name> Run a specific test (e.g., test_tokenizer)"
-	@echo "  make example               Build and run the example usage"
+	@echo "  make example               Build and run the default example (example_usage.c)"
+	@echo "  make example EXAMPLE_FILE=<name.c> Build and run a specific example file"
 	@echo "  make clean                 Clean all build artifacts"
+	@echo ""
+	@echo "Variables:"
+	@echo "  BUILD_MODE=<mode>          Set build mode (default: release). Options:"
+	@echo "                              - release: Optimized for performance (-O3)"
+	@echo "                              - debug: Includes debug symbols (-g)"
+	@echo "  LIB_TYPE=<type>            Set library type (default: static). Options:"
+	@echo "                              - static: Builds a static library (.a)"
+	@echo "                              - shared: Builds a shared library (.so)"
+	@echo "  TEST_FILE=<name>           Specify which test to run (default: test_parser)"
+	@echo "  EXAMPLE_FILE=<name.c>      Specify which example to run (default: example_usage.c)"
 
 # Phony targets
 .PHONY: all static shared test example clean help

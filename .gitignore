@@ -7,5 +7,9 @@ build/
 # Ignore editor/IDE-specific files
 *.swp
 *.swo
+.autotools
+.cproject
+.project
 .vscode/
 .idea/
+.settings/
