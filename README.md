@@ -174,8 +174,8 @@ int main() {
 ├── README.md                # Project documentation
 ├── src/
 │   ├── json_accessor.c      # Implementation of accessor functions
-│   ├── json_config.c        # Implementation for configuration (if needed)
-│   ├── json_logging.c       # Implementation for logging functionality (if needed)
+│   ├── json_config.c        # Implementation for configuration (not needed till now)
+│   ├── json_logging.c       # Implementation for logging functionality (not needed till now)
 │   ├── json_parser.c        # Implementation of the JSON parser
 │   ├── json_printer.c       # Implementation of the JSON printer
 │   ├── json_tokenizer.c     # Implementation of the tokenizer
