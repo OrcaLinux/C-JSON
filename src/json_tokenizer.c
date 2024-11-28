@@ -57,7 +57,7 @@ static void skip_whitespace(JsonTokenizer *tokenizer)
 {
     while (json_is_whitespace(tokenizer->json[tokenizer->pos]))
     {
-        DEBUG_PRINT("Tokenizer: Skipping whitespace at position %zu\n", tokenizer->pos); // Debug
+        DEBUG_PRINT("Tokenizer: Skipping whitespace at position %zu\n", tokenizer->pos);
         tokenizer->pos++;
     }
 }
@@ -69,43 +69,43 @@ JsonToken json_get_next_token(JsonTokenizer *tokenizer)
     token.value = NULL;
 
     char current = tokenizer->json[tokenizer->pos];
-    DEBUG_PRINT("Tokenizer: Current char '%c' at position %zu\n", current, tokenizer->pos); // Debug
+    DEBUG_PRINT("Tokenizer: Current char '%c' at position %zu\n", current, tokenizer->pos);
 
     switch (current)
     {
     case '\0':
         token.type = TOKEN_EOF;
-        DEBUG_PRINT("Tokenizer: TOKEN_EOF\n"); // Debug
+        DEBUG_PRINT("Tokenizer: TOKEN_EOF\n");
         break;
     case '{':
         token.type = TOKEN_LEFT_BRACE;
         tokenizer->pos++;
-        DEBUG_PRINT("Tokenizer: TOKEN_LEFT_BRACE\n"); // Debug
+        DEBUG_PRINT("Tokenizer: TOKEN_LEFT_BRACE\n");
         break;
     case '}':
         token.type = TOKEN_RIGHT_BRACE;
         tokenizer->pos++;
-        DEBUG_PRINT("Tokenizer: TOKEN_RIGHT_BRACE\n"); // Debug
+        DEBUG_PRINT("Tokenizer: TOKEN_RIGHT_BRACE\n");
         break;
     case '[':
         token.type = TOKEN_LEFT_BRACKET;
         tokenizer->pos++;
-        DEBUG_PRINT("Tokenizer: TOKEN_LEFT_BRACKET\n"); // Debug
+        DEBUG_PRINT("Tokenizer: TOKEN_LEFT_BRACKET\n");
         break;
     case ']':
         token.type = TOKEN_RIGHT_BRACKET;
         tokenizer->pos++;
-        DEBUG_PRINT("Tokenizer: TOKEN_RIGHT_BRACKET\n"); // Debug
+        DEBUG_PRINT("Tokenizer: TOKEN_RIGHT_BRACKET\n");
         break;
     case ':':
         token.type = TOKEN_COLON;
         tokenizer->pos++;
-        DEBUG_PRINT("Tokenizer: TOKEN_COLON\n"); // Debug
+        DEBUG_PRINT("Tokenizer: TOKEN_COLON\n");
         break;
     case ',':
         token.type = TOKEN_COMMA;
         tokenizer->pos++;
-        DEBUG_PRINT("Tokenizer: TOKEN_COMMA\n"); // Debug
+        DEBUG_PRINT("Tokenizer: TOKEN_COMMA\n");
         break;
     case '"':
     {
@@ -116,8 +116,8 @@ JsonToken json_get_next_token(JsonTokenizer *tokenizer)
         {
             if (tokenizer->json[tokenizer->pos] == '\\')
             {
-                DEBUG_PRINT("Tokenizer: Escaped character '\\' at position %zu\n", tokenizer->pos); // Debug
-                tokenizer->pos += 2;                                                                // Skip escaped character
+                DEBUG_PRINT("Tokenizer: Escaped character '\\' at position %zu\n", tokenizer->pos);
+                tokenizer->pos += 2; // Skip escaped character
             }
             else
             {
@@ -129,13 +129,13 @@ JsonToken json_get_next_token(JsonTokenizer *tokenizer)
         {
             token.type = TOKEN_STRING;
             token.value = json_strdup_range(tokenizer->json + start, length);
-            tokenizer->pos++;                                                      // Skip closing quote
-            DEBUG_PRINT("Tokenizer: TOKEN_STRING with value '%s'\n", token.value); // Debug
+            tokenizer->pos++; // Skip closing quote
+            DEBUG_PRINT("Tokenizer: TOKEN_STRING with value '%s'\n", token.value);
         }
         else
         {
             token.type = TOKEN_ERROR;
-            DEBUG_PRINT("Tokenizer: TOKEN_ERROR while parsing string at position %zu\n", tokenizer->pos); // Debug
+            DEBUG_PRINT("Tokenizer: TOKEN_ERROR while parsing string at position %zu\n", tokenizer->pos);
         }
         break;
     }
@@ -144,12 +144,12 @@ JsonToken json_get_next_token(JsonTokenizer *tokenizer)
         {
             token.type = TOKEN_TRUE;
             tokenizer->pos += 4;
-            DEBUG_PRINT("Tokenizer: TOKEN_TRUE\n"); // Debug
+            DEBUG_PRINT("Tokenizer: TOKEN_TRUE\n");
         }
         else
         {
             token.type = TOKEN_ERROR;
-            DEBUG_PRINT("Tokenizer: TOKEN_ERROR while parsing 't' at position %zu\n", tokenizer->pos); // Debug
+            DEBUG_PRINT("Tokenizer: TOKEN_ERROR while parsing 't' at position %zu\n", tokenizer->pos);
         }
         break;
     case 'f':
@@ -157,12 +157,12 @@ JsonToken json_get_next_token(JsonTokenizer *tokenizer)
         {
             token.type = TOKEN_FALSE;
             tokenizer->pos += 5;
-            DEBUG_PRINT("Tokenizer: TOKEN_FALSE\n"); // Debug
+            DEBUG_PRINT("Tokenizer: TOKEN_FALSE\n");
         }
         else
         {
             token.type = TOKEN_ERROR;
-            DEBUG_PRINT("Tokenizer: TOKEN_ERROR while parsing 'f' at position %zu\n", tokenizer->pos); // Debug
+            DEBUG_PRINT("Tokenizer: TOKEN_ERROR while parsing 'f' at position %zu\n", tokenizer->pos);
         }
         break;
     case 'n':
@@ -170,12 +170,12 @@ JsonToken json_get_next_token(JsonTokenizer *tokenizer)
         {
             token.type = TOKEN_NULL;
             tokenizer->pos += 4;
-            DEBUG_PRINT("Tokenizer: TOKEN_NULL\n"); // Debug
+            DEBUG_PRINT("Tokenizer: TOKEN_NULL\n");
         }
         else
         {
             token.type = TOKEN_ERROR;
-            DEBUG_PRINT("Tokenizer: TOKEN_ERROR while parsing 'n' at position %zu\n", tokenizer->pos); // Debug
+            DEBUG_PRINT("Tokenizer: TOKEN_ERROR while parsing 'n' at position %zu\n", tokenizer->pos);
         }
         break;
     default:
@@ -200,12 +200,12 @@ JsonToken json_get_next_token(JsonTokenizer *tokenizer)
             size_t length = tokenizer->pos - start;
             token.type = TOKEN_NUMBER;
             token.value = json_strdup_range(tokenizer->json + start, length);
-            DEBUG_PRINT("Tokenizer: TOKEN_NUMBER with value '%s'\n", token.value); // Debug
+            DEBUG_PRINT("Tokenizer: TOKEN_NUMBER with value '%s'\n", token.value);
         }
         else
         {
             token.type = TOKEN_ERROR;
-            DEBUG_PRINT("Tokenizer: TOKEN_ERROR with unrecognized character '%c' at position %zu\n", current, tokenizer->pos); // Debug
+            DEBUG_PRINT("Tokenizer: TOKEN_ERROR with unrecognized character '%c' at position %zu\n", current, tokenizer->pos);
         }
         break;
     }
