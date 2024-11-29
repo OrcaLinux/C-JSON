@@ -25,8 +25,6 @@ insert_final_newline = true
 [*.c]
 # Use 4 spaces for indentation
 indent_size = 4
-
-# Enable the use of tabs in C source files (optional, can use spaces as well)
 indent_style = space
 
 # Set the maximum line length (good practice for readability)
@@ -43,3 +41,18 @@ max_line_length = 80
 [Makefile]
 indent_style = tab
 indent_size = 4
+
+# Settings for Markdown files (*.md, *.markdown)
+[*.{md,markdown}]
+# Use 2 spaces for indentation (common in Markdown)
+indent_style = space
+indent_size = 2
+
+# Set the maximum line length for better readability
+max_line_length = 80
+
+# Trim trailing whitespaces
+trim_trailing_whitespace = true
+
+# Ensure a final newline at the end of files
+insert_final_newline = true
