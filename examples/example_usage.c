@@ -1,5 +1,6 @@
 #include "json_parser.h"
 #include "json_printer.h"
+#include "json_serializer.h"
 #include "json_accessor.h"
 #include "json_types.h"
 #include <stdio.h>
@@ -59,6 +60,18 @@ int main()
         }
 
         printf("Nickname: %s\n", has_nickname ? "null" : "Exists");
+
+        /* Serialize the JSON tree back to a JSON-formatted string */
+        char *serialized_json = json_serialize(root);
+        if (serialized_json)
+        {
+            printf("\nSerialized JSON:\n%s\n", serialized_json);
+            json_free(serialized_json); // Free the allocated string
+        }
+        else
+        {
+            printf("Failed to serialize JSON.\n");
+        }
 
         /* Free the parse tree */
         json_free_value(root);
