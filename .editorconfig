@@ -47,12 +47,3 @@ indent_size = 4
 # Use 2 spaces for indentation (common in Markdown)
 indent_style = space
 indent_size = 2
-
-# Set the maximum line length for better readability
-max_line_length = 80
-
-# Trim trailing whitespaces
-trim_trailing_whitespace = true
-
-# Ensure a final newline at the end of files
-insert_final_newline = true
